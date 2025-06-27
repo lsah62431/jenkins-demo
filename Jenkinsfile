@@ -2,38 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('تثبيت المتطلبات') {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
-
-        stage('تحقق من الكود') {
-            steps {
-                echo 'تشغيل الكود بدون بناء'
-                sh 'python3 main.py'
-            }
-        }
-
         stage('Build') {
             steps {
-                echo 'تحويل سكربت بايثون إلى ملف تنفيذي'
-                sh 'pyinstaller --onefile main.py'
+                echo '🔧 بناء الكود'
+                sh 'javac Main.java'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'تشغيل اختبارات الوحدة'
-                sh 'pytest test_main.py'
+                echo '🧪 اختبار الكود'
+                sh 'javac MainTest.java'
+                sh 'java MainTest'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to AWS') {
             steps {
-                echo 'نشر الملف التنفيذي إلى سيرفر AWS'
+                echo '🚀 نشر إلى سيرفر AWS'
                 sh '''
-                scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa dist/main ec2-user@your-aws-ip:/home/ec2-user/
+                    scp -o StrictHostKeyChecking=no -i ~/.ssh -i "jenkins.pem" ubuntu@ec2-18-197-11-40.eu-central-1.compute.amazonaws.com
                 '''
             }
         }
